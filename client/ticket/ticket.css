@@ -1,0 +1,26 @@
+th {
+	text-align: left;
+	height: 50px;
+	width: 500px;
+	background-color: white;
+	-webkit-text-fill-color: green;
+}
+
+td{
+	overflow: auto;
+	text-align: left;
+}
+
+table.problemsTable tbody{
+	/*height: 80em;*/
+	overflow: scroll;
+	overflow: auto;
+}
+
+textarea {
+	resize: none;
+}
+
+#ticketNavigation{
+	float: left;
+}

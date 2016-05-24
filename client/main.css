@@ -1,0 +1,22 @@
+div.container{
+    
+}
+
+ul.pagination li.active a:link, ul.pagination li.active a:active {
+	border: 1px solid #6FB34A;
+    background-color: #6FB34A;
+	font-weight: normal;
+    color: white;
+}
+
+ul.pagination li a:link {
+    color: #333;
+}
+
+ul li a:link {
+	outline: none;
+}
+
+ul li a:hover {
+	font-weight: bold;
+}

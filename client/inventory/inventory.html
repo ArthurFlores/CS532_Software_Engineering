@@ -1,0 +1,347 @@
+<template name="inventory">
+    <div class="body-container">
+        <div class="item">
+            <h3>Inventory</h3>
+            <div class="col-lg-8"></div>
+            <div class="col-lg-4">
+                <div class="input-group">
+                    
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-4 -->
+            {{ > shoppingCart }}
+            <br>
+        	{{ > inventoryTable }}
+        </div>
+    </div>
+        
+</template>
+       
+<template name="inventoryTable">
+    <div id="searchDisplay" class="row">
+        
+        <div class="col-md-3">
+            <button id="inv_addNewProduct" type="button" class="btn btn-default" aria-label="Left Align">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                Add new product
+            </button>
+        </div>
+        
+        <div class="col-md-3"></div>
+        
+        <div class="col-md-3">
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon1">
+                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                </span>
+                <input id="inv_query" type="text" class="form-control" placeholder="Filter" aria-describedby="basic-addon1">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="btn-group " role="group" aria-label="...">
+                
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Condition <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" id="inv_conditionLink">
+                    <li><a href="#" value="2">New & Used</a></li>
+                    <li><a href="#" value="0" >New</a></li>
+                    <li><a href="#" value="1" >Used</a></li>
+                </ul>
+            </div>
+            <div class="btn-group " role="group" aria-label="...">
+                
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Category <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" id="inv_categoriesLink">
+                    <li><a href="#" value="4">All Categories</a></li>
+                    <li><a href="#" value="0" >Bikes</a></li>
+                    <li><a href="#" value="1" >Bike Parts & Supplies</a></li>
+                    <li><a href="#" value="2" >Bike Clothing</a></li>
+                    <li><a href="#" value="3" >Repair Parts & Supplies</a></li>
+                </ul>
+                
+            </div>
+        </div>
+        
+    </div>
+    <div id="simpleDisplay">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>On-Hand</th>
+                    <th>Condition</th>
+                    <th>Category</th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each item }}
+                <tr>
+                    <td>{{name}} </td>
+                    <td>{{description}} </td>
+                    <td>${{cost}} </td>
+                    <td>{{quantity}} </td>
+                    <td>{{conditionFilter condition }} </td>
+                    <td>{{categoryFilter category }} </td>
+                    <td>
+                        <a href="#" rel="{{_id}}" id="inv_editItem" >
+                            <button type="button" class="btn btn-default" aria-label="Right Align">
+                                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                            </button>
+                        </a>
+                    </td>
+                </tr>
+                {{/each }}
+            </tbody>
+        </table>
+    </div>
+
+</template>
+
+<template name="dialogEditInventory">
+    {{#with getProduct}}
+	<div class="row">
+		<div class="col-md-12">
+			<form class="form-horizontal">
+                
+				<!--
+                <div class="form-group">
+					<div class="col-md-10">
+						<label for="txtProductName">{{name}}</label>
+					</div>
+				</div>
+                -->
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <input type="radio" name="action" id="actionRadioSell" value="0" checked>
+                        <label for="actionRadioSell" class="middleAlign">
+                            Sell Inventory
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-6">                        
+                        <input type="radio" name="action" id="actionRadioRm" value="1" >
+                        <label for="actionRadioRm" class="middleAlign">
+                            Remove Inventory
+                        </label>
+                    </div>
+                </div>
+                        
+                <div class="form-group">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-6">
+                        <input type="checkbox" id="rtvCheckbox" value="1" disabled>
+                        <label for="rtvCheckbox" class="middleAlign">
+                            Return to Vendor
+                        </label>
+                    </div>
+                </div>
+                      
+                <div class="form-group">
+                    <div class="col-md-1"></div>                    
+                    <div class="col-md-6">
+                        <input type="checkbox" id="defectiveProd" value="1" disabled>
+                        <label for="defectiveProd" class="middleAlign">
+                            Product is Defective
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="col-md-6">                        
+                        <input type="radio" name="action" id="actionRadioRm" value="1" >
+                        <label for="actionRadioRm" class="middleAlign">
+                            Add Inventory
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+					<div class="col-md-4">
+						<label for="txtProductQuantity">
+                            On-hand stock: {{quantity}}
+                        </label>
+                        <br>
+                        <label for="txtProductQuantity">
+                            In-cart stock: {{planned}}
+                        </label>
+                        <input id="txtProductQuantity" type="text" placeholder="Adjustment Quantity" class="form-control input-md">
+					</div>
+				</div>
+                
+				<div class="form-group">
+					<div class="col-md-4">
+						<label for="txtEditProductCost">Price</label>
+						<input id="txtEditProductCost" type="text" placeholder="Price" class="form-control input-md" value="{{cost}}">
+					</div>
+				</div>
+                
+                <div class="form-group">
+					<div class="col-md-4">
+						<label for="txtEditProductCategory">Category</label>
+						<select id="txtEditProductCategory" class="form-control">
+                            <option value="0">Bikes</option>
+                            <option value="1">Bike Parts & Supplies</option>
+                            <option value="2">Bike Clothing</option>
+                            <option value="3">Repair Parts & Supplies</option>
+                        </select>
+					</div>
+				</div>
+                
+                <div class="form-group">
+					<div class="col-md-4">
+						<label for="txtEditProductCondition">Condition</label>
+						<select id="txtEditProductCondition" class="form-control">
+                            <option value="0">New</option>
+                            <option value="1">Used</option>
+                        </select>
+					</div>
+				</div>
+                
+				<div class="form-group">
+					<div class="col-md-10">
+						<label for="txtEditProductDesc">Description</label>
+						<textarea id="txtEditProductDesc" style="width: 350px; height: 200px;" class="form-control" placeholder="Address">{{description}}</textarea>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+    {{/with}}
+</template>
+
+<template name="shoppingCart">
+    {{#if shoppingCartExists}}
+    <div id="inv_cartRow">
+        <div class="col-md-10"></div>
+        <div class="col-md-2">
+            <button id="inc_checkoutButton" type="button" class="btn btn-success" aria-label="Right Align">
+                <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span>
+                Checkout <span class="badge"> {{ shoppingCartLength }} </span>
+            </button>
+        </div>
+    </div>
+    {{/if}}
+</template>
+
+<template name="dialogInventoryCheckout">
+	<div class="row">
+		<div class="col-md-12">
+			<table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Status</th>
+                        <th>In Cart</th>
+                        <th>In Stock</th>
+                        <th>Price Ea.</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each getCart}}
+                    <tr>
+                        <td>{{name}}</td>
+                        <td>
+                            {{#if isLoss rtv defective}}
+                                {{#if rtv }}
+                                    <span class="label label-warning">RTV</span>
+                                {{/if}}
+                                
+                                {{#if defective }}
+                                    <span class="label label-danger">Defective</span>
+                                {{/if}}
+                            {{else}}
+                            <span class="label label-success">Sale</span>
+                            {{/if}}
+                        </td>
+                        <td>{{planned}}</td>
+                        <td>{{quantity}}</td>
+                        <td>${{cost}}</td>
+                        <td>
+                        {{#if isLoss rtv defective }}
+                            ${{getLoss planned cost}}
+                        {{else}}
+                            ${{getItemCost planned cost}}
+                        {{/if}}
+                        </td>
+                    </tr>
+                    {{/each}}
+                    <tr>
+                        <th>Subtotal</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th>${{getSubtotal}}</th>
+                    </tr>
+                </tbody>
+            </table>
+		</div>
+	</div>
+</template>
+
+<template name="dialogNewInventory">
+    <div class="row">
+		<div class="col-md-12">
+			<form class="form-horizontal">
+				<div class="form-group">
+					<div class="col-md-10">
+						<label for="txtProductName">Product Name</label>
+						<input id="txtProductName" type="text" placeholder="Name" class="form-control input-md">
+					</div>
+				</div>
+                
+				<div class="form-group">
+					<div class="col-md-10">
+						<label for="txtProductOnHand">On-Hand Quantity</label>
+                        <input id="txtProductOnHand" type="text" placeholder="On-Hand" class="form-control input-md">
+					</div>
+				</div>
+                
+				<div class="form-group">
+					<div class="col-md-4">
+						<label for="txtProductPrice">Price</label>
+						<input id="txtProductPrice" type="text" placeholder="Price" class="form-control input-md">
+					</div>
+				</div>
+                
+                <div class="form-group">
+					<div class="col-md-4">
+						<label for="txtProductCategory">Category</label>
+						<select id="txtProductCategory" class="form-control">
+                            <option value="0">Bikes</option>
+                            <option value="1">Bike Parts & Supplies</option>
+                            <option value="2">Bike Clothing</option>
+                            <option value="3">Repair Parts & Supplies</option>
+                        </select>
+					</div>
+				</div>
+                
+                <div class="form-group">
+					<div class="col-md-4">
+						<label for="txtProductCondition">Condition</label>
+						<select id="txtProductCondition" class="form-control">
+                            <option value="0">New</option>
+                            <option value="1">Used</option>
+                        </select>
+					</div>
+				</div>
+                
+                <div class="form-group">
+					<div class="col-md-10">
+						<label for="txtProductDesc">Description</label>
+                        <textarea id="txtProductDesc" style="width: 350px; height: 200px;" class="form-control" placeholder="Description"></textarea>
+					</div>
+				</div>
+                
+			</form>
+		</div>
+	</div>
+</template>

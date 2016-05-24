@@ -1,0 +1,241 @@
+<template name="ems">
+    <div class="body-container">
+        <div class="item">
+            <h3>Employee Management System</h3>
+			<nav id="employeeNavigation">
+                <ul class="pagination">
+                    <li class="active" id="Employees"><a href="#">Employee Info</a></li>
+                    <li id="Schedule"><a href="#">Work Schedule</a></li>
+                    <li id="Clock"><a href="#">Time Clock</a></li>
+                </ul>
+            </nav>
+            <div class="tableEmployees" id="displayTable">
+				{{ > employees }}
+            </div>
+            <div class="tableSchedule" id="displayTable" style="display:none;">
+                {{ > schedule }}
+    
+            </div>
+            <div class="tableClock" id="displayTable" style="display:none;">
+                {{ > clock }}
+            </div>
+        </div>   
+    </div>
+</template>
+
+<template name="employees">
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+	
+
+    {{> reactiveTable settings=all_employees }}
+	
+	
+	<button type="button" class="btn btn-default" id="btnExportPayroll">Export Payroll Data</button>
+	<button type="button" class="btn btn-default" id="btnAddEmployee">Add Employee</button>
+</template>
+
+<template name="dialogEditEmployee">
+    <div class="row">
+        <div class="col-md-12">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-4">
+                        <label for="txtEditEmployeeFName">First Name</label>
+                        <input id="txtEditEmployeeFName" type="text" placeholder="First Name" class="form-control input-md">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="txtEditEmployeeLName">Last Name</label>
+                        <input id="txtEditEmployeeLName" type="text" placeholder="Last Name" class="form-control input-md">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-4">
+                        <label for="txtEditEmployeePosition">Position</label>
+                        <select id="txtEditEmployeePosition" class="form-control input-md">
+                            <option value="Admin">Admin</option>
+                            <option value="Sales">Sales</option>
+                            <option value="Technician">Technician</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="txtEditEmployeeWage">Wage</label>
+                        <input id="txtEditEmployeeWage" type="number" name="wage" min="0" max="50" step="0.01" value="15.00" placeholder="0.00" class="form-control input-md">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-4">
+                        <label for="txtEditEmployeeSSN">SSN</label>
+                        <input id="txtEditEmployeeSSN" type="text" placeholder="SSN" class="form-control input-md" maxlength="9">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-8">
+                        <label for="txtEditEmployeeAddress">Address</label>
+                        <input id="txtEditEmployeeAddress" type="text" placeholder="Address" class="form-control input-md">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-4">
+                        <label for="txtEditEmployeeCity">City</label>
+                        <input id="txtEditEmployeeCity" type="text" placeholder="City" class="form-control input-md">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-2">
+                        <label for="txtEditEmployeeState">State</label>
+                        <input id="txtEditEmployeeState" type="text" placeholder="State" class="form-control input-md">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-2">
+                        <label for="txtEditEmployeeZip">Zip</label>
+                        <input id="txtEditEmployeeZip" type="text" placeholder="Zip" class="form-control input-md" maxlength="5">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</template>
+
+<template name="employeeActionsColumn">
+    <button type="button" id="btnEditEmployee" class="btn btn-default">Edit</button>
+</template>
+
+<template name="schedule">
+    <!--{{>fullcalendar options}}  -->
+     <div id='calendar'> </div>
+
+     <script>
+        
+    $(document).ready(function() {
+
+    // page is now ready, initialize the calendar...
+
+    $('#calendar:not(".fc-event")').on('contextmenu', function (e) {
+        e.preventDefault()
+    })
+    
+    $('#calendar').fullCalendar({
+        // put your options and callbacks here
+        header: {
+                left: '',
+                center: 'title',
+                right: 'today month,agendaWeek,agendaDay prev,next'
+            },
+            class: "mainCalendar",
+            events: function(start, end, timezone, callback) {
+                
+                       var eventsArray = [];
+                       var allEvents = Events.find({}).fetch();
+                       allEvents.forEach(function(row) {
+                            eventObj = {
+                                title: row.title,
+                                start: row.start,
+                                id: row._id,
+                               }
+                            eventsArray.push(eventObj);
+                        });
+
+                      callback(eventsArray);
+            },    
+            height: 600,
+            handleWindowResize:true,
+            editable: true,
+            selectable: true,
+            dayClick: function(){
+
+              alert('day clicked')  
+            },
+            eventDrop: function(event, delta, revertFunc) {
+                alert(event.title + " was dropped on " + event.start.format());
+
+                if (!confirm("Are you sure about this change?")) {
+                    revertFunc(); 
+                }
+                else{
+                    Events.update({_id: event.id},{ $set: {start: event.start.format() }} );
+                }
+            },
+            eventRender: function (event, element , revertFunc) {
+                element.bind('mousedown', function (e) {
+                 if (e.which == 3) {
+                    if (confirm("Are you sure you want to remove "+event.title+"?")) {
+                        Events.remove({_id: event.id});
+                        $('#calendar').fullCalendar( 'removeEvents', event.id);
+                    }   
+                 }
+                 });
+            }
+            
+         })
+
+    });
+</script>
+    <button class="addEvent">Add Event</button>
+     
+</template>
+
+<template name="dialogEditEvent">
+	<div class="row">
+		<div class="col-md-12">
+			<form class="form-horizontal">
+				<div class="form-group">
+					<div class="col-md-10">
+						<label for="txtEditEventTitle">Title</label>
+						<select id="selectEditEventTitle" class="form-control input-md">
+							<option disabled selected hidden>Select Employee</option>
+							{{#each All_Employees}}
+							<option value="{{this._id}}">{{this.name.firstname}} {{this.name.lastname}}</option>
+							{{/each}}
+						</select>
+                        <!--<textarea id="txtEditEventTitle" style="width: 400px; height: 40px;" class="form-control input-md" placeholder="Title"></textarea> -->
+					</div>
+				</div>
+                
+                <div class="form-group">
+					<div class="col-md-10">
+						<label for="txtEditEventDate">Date</label>
+						<textarea id="txtEditEventMonth" style="width: 100px; height: 40px;" class="form-control input-md" placeholder="Month: xx"></textarea>
+                        <textarea id="txtEditEventDay" style="width: 100px; height: 40px;" class="form-control input-md" placeholder="Day: xx"></textarea>
+                        <textarea id="txtEditEventYear" style="width: 100px; height: 40px;" class="form-control input-md" placeholder="Year: xxxx"></textarea>
+					</div>
+				</div>
+                
+                <div class="form-group">
+					<div class="col-md-10">
+						<label for="txtEditEventTime">Time (In Military Time)</label>
+						<textarea id="txtEditEventHour" style="width: 100px; height: 40px;" class="form-control input-md" placeholder="Hour: xx"></textarea>
+                        <textarea id="txtEditEventMin" style="width: 100px; height: 40px;" class="form-control input-md" placeholder="Minutes: xx"></textarea>
+                        
+					</div>
+				</div>
+                
+			</form>
+		</div>
+	</div>
+</template>
+
+<template name="clock">
+    <table id="clockTable" class="table table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Time</th> <!-- displays a live countup clock showing how long the employee has work for that day so far -->
+				<th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>John Smith</td>
+            <td>3/5/2016</td>
+            <td>1234</td>
+            <td>05:42:36</td>
+            <td><button type="button" onclick="alert('Clock currently logged in employee in/out...')">Clock In/Out</button></td>
+        </tr>
+        </tbody>
+    </table>
+</template>
